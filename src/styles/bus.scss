@@ -82,6 +82,10 @@ html, body {
         background-color: rgb(253, 227, 110);
         margin-bottom: 0.5rem;
         cursor: pointer;
+        &.active {
+          background-color: #e67272;
+          color: white;
+        }
       }
     }
   }

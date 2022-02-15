@@ -97,6 +97,7 @@ export default {
         )
         .then((res) => {
           this.busList = res.data;
+          this.busList.forEach((obj) => (obj.isActive = false));
           console.log("res.data:", this.busList);
           // 更新地圖原點，以busList第一筆站牌之經緯度為中心
           openStreetMap.panTo(
@@ -133,6 +134,9 @@ export default {
       });
     },
     updateOrigin(index) {
+      this.busList.forEach((obj) => (obj.isActive = false)); //reset isActive
+      this.busList[index].isActive = true;
+      console.log('更新的busList:', this.busList)
       openStreetMap.panTo(
         new L.LatLng(
           this.busList[index].StationPosition.PositionLat,

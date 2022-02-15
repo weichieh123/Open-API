@@ -1,5 +1,5 @@
 <template>
-  <div class="bus-item" @click="$emit('origin')">
+  <div class="bus-item" @click="$emit('origin')" :class="{active: bus.isActive}">
     {{ bus.StationName.Zh_tw }}
   </div>
 </template>
