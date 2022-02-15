@@ -1,6 +1,6 @@
 <template>
   <div id="bus-line">
-    <div class="left" :class="{scroll: this.busList.length}">
+    <div class="left" :class="{ scroll: this.busList.length }">
       <h1>公車路線查詢頁</h1>
       <div class="search">
         <select v-model="selectedCity" name="selectedCity" id="selectedCity">
@@ -14,8 +14,8 @@
         </select>
         <button @click="searchBus">搜尋BUS路線</button>
       </div>
-      
-      <div class="bus-list" :class="{scroll: this.busList.length}" >
+
+      <div class="bus-list" :class="{ scroll: this.busList.length }">
         <BusLineItem
           v-for="(bus, index) in busList"
           :key="index"
@@ -35,6 +35,7 @@ import L from 'leaflet';
 import axios from 'axios';
 import BusLineItem from './BusLineItem.vue';
 import cityOptions from '@/store/cityOptions.js';
+import jsSHA from "jssha" ;
 // 設定空物件
 // TODO: reset舊的路線標記
 let openStreetMap = {};
@@ -71,8 +72,30 @@ export default {
       maxZoom: 20,
     }).addTo(openStreetMap);
     // L.geoJSON(geojsonFeature).addTo(openStreetMap);
+    // console.log(process.env.VUE_APP_ID, process.env.VUE_APP_KEY);
   },
   methods: {
+    GetAuthorizationHeader() {
+      let AppID = process.env.VUE_APP_ID;
+      let AppKey = process.env.VUE_APP_KEY;
+
+      let GMTString = new Date().toGMTString();
+      let ShaObj = new jsSHA('SHA-1', 'TEXT');
+      ShaObj.setHMACKey(AppKey, 'TEXT');
+      ShaObj.update('x-date: ' + GMTString);
+      let HMAC = ShaObj.getHMAC('B64');
+      let Authorization =
+        'hmac username="' +
+        AppID +
+        '", algorithm="hmac-sha1", headers="x-date", signature="' +
+        HMAC +
+        '"';
+
+      return {
+        Authorization: Authorization,
+        'X-Date': GMTString /*,'Accept-Encoding': 'gzip'*/,
+      }; //如果要將js運行在伺服器，可額外加入 'Accept-Encoding': 'gzip'，要求壓縮以減少網路傳輸資料量
+    },
     searchBus() {
       // 搜尋此城市(selectedCity)之所有BUS，存至busList，並增加一個欄位isActive作為tag class highlight依據
       axios
@@ -84,6 +107,7 @@ export default {
               top: '30',
               format: 'JSON',
             },
+            headers: this.GetAuthorizationHeader(),
           }
         )
         .then((res) => {
@@ -109,12 +133,14 @@ export default {
               top: '30',
               format: 'JSON',
             },
+            headers: this.GetAuthorizationHeader(),
           }),
           axios.get(routeGeoURL + this.selectedCity + '/' + this.selectedBus, {
             params: {
               top: '30',
               format: 'JSON',
             },
+            headers: this.GetAuthorizationHeader(),
           }),
         ])
         .then(

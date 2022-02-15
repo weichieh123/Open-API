@@ -33,7 +33,8 @@
 import L from "leaflet";
 import axios from "axios";
 import BusStopItem from "./BusStopItem.vue";
-import cityOptions from "@/store/cityOptions.js"
+import cityOptions from "@/store/cityOptions.js";
+import jsSHA from "jssha" ;
 // 設定空物件
 let openStreetMap = {};
 
@@ -61,6 +62,27 @@ export default {
     }).addTo(openStreetMap);
   },
   methods: {
+    GetAuthorizationHeader() {
+      let AppID = process.env.VUE_APP_ID;
+      let AppKey = process.env.VUE_APP_KEY;
+
+      let GMTString = new Date().toGMTString();
+      let ShaObj = new jsSHA('SHA-1', 'TEXT');
+      ShaObj.setHMACKey(AppKey, 'TEXT');
+      ShaObj.update('x-date: ' + GMTString);
+      let HMAC = ShaObj.getHMAC('B64');
+      let Authorization =
+        'hmac username="' +
+        AppID +
+        '", algorithm="hmac-sha1", headers="x-date", signature="' +
+        HMAC +
+        '"';
+
+      return {
+        Authorization: Authorization,
+        'X-Date': GMTString /*,'Accept-Encoding': 'gzip'*/,
+      }; //如果要將js運行在伺服器，可額外加入 'Accept-Encoding': 'gzip'，要求壓縮以減少網路傳輸資料量
+    },
     searchBusStop() {
       axios
         .get(
@@ -70,6 +92,7 @@ export default {
               top: "30",
               format: "JSON",
             },
+            headers: this.GetAuthorizationHeader(),
           }
         )
         .then((res) => {
