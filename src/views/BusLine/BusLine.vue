@@ -35,27 +35,14 @@ import axios from 'axios';
 import BusLineItem from './BusLineItem.vue';
 import cityOptions from '@/store/cityOptions.js';
 // 設定空物件
+// TODO: reset舊的路線標記
 let openStreetMap = {};
-
-let geojsonFeature = {
-  type: 'Feature',
-  properties: {
-    name: 'Coors Field',
-    amenity: 'Baseball Stadium',
-    popupContent: 'This is where the Rockies play!',
-  },
-  geometry: {
-    type: 'Point',
-    coordinates: [-104.99404, 39.75621],
-  },
-};
 
 let myStyle = {
   color: '#ff7800',
   weight: 5,
   opacity: 0.65,
 };
-// TODO: reset舊的路線標記
 
 export default {
   name: 'BusStop',
@@ -157,10 +144,11 @@ export default {
     },
     updateMap() {
       // ADD
-      let geoLayer = L.geoJSON(geojsonFeature).addTo(openStreetMap);
-      let layerGroup = new L.LayerGroup();
-      layerGroup.addTo(openStreetMap);
-      // if (this.selectedBus) layerGroup.removeLayer(geoLayer);
+      let geoLayer, layerGroup;
+      if (this.selectedBus && geoLayer) {
+        console.log('清除上一筆路線');
+        layerGroup.removeLayer(geoLayer);
+      }
       // clear markers
       openStreetMap.eachLayer((layer) => {
         if (layer instanceof L.Marker) {
@@ -185,14 +173,16 @@ export default {
         },
       ];
       // ADD
-      layerGroup.addLayer(geoLayer);
-      // layerGroup.removeLayer(geoLayer);
-      geoLayer.addData(myLines, {
+      // let geoLayer = L.geoJSON().addTo(openStreetMap);
+      geoLayer = L.geoJSON(myLines, {
         style: myStyle,
-      });
-      // L.geoJSON(myLines, {
+      }).addTo(openStreetMap);
+      layerGroup = new L.LayerGroup();
+      layerGroup.addTo(openStreetMap);
+      layerGroup.addLayer(geoLayer);
+      // geoLayer.addData(myLines, {
       //   style: myStyle,
-      // }).addTo(openStreetMap);
+      // });
     },
     chooseBus(index) {
       // 按下Bus後，將所選的bus存至selectedBus，並將tag highlight
