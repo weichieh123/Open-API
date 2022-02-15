@@ -1,6 +1,6 @@
 <template>
   <div id="bus-line">
-    <div class="left">
+    <div class="left" :class="{scroll: this.busList.length}">
       <h1>公車路線查詢頁</h1>
       <div class="search">
         <select v-model="selectedCity" name="selectedCity" id="selectedCity">
@@ -14,7 +14,8 @@
         </select>
         <button @click="searchBus">搜尋BUS路線</button>
       </div>
-      <div class="bus-list">
+      
+      <div class="bus-list" :class="{scroll: this.busList.length}" >
         <BusLineItem
           v-for="(bus, index) in busList"
           :key="index"

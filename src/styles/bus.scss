@@ -45,7 +45,9 @@ html, body {
     display: flex;
     flex-direction: column;
     width: 40vw;
-    height: calc(100vh - 100px);
+    &.scroll {
+      height: calc(100vh - 100px);
+    }
     @include mobile {
       width: 100vw;
     }
@@ -71,9 +73,11 @@ html, body {
     }
     .bus-list {
       position: relative;
-      overflow-y: scroll;
-      flex-grow: 1;
       margin: 1rem 2rem;
+      &.scroll {
+        flex-grow: 1;
+        overflow-y: scroll;
+      }
       .bus-item {
         background-color: rgb(253, 227, 110);
         margin-bottom: 0.5rem;
