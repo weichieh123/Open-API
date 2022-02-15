@@ -1,0 +1,97 @@
+$mainColor: #42b983;
+$darkColor: #2c3e50;
+@mixin mobile {
+  @media (max-width: 576px){
+    @content;
+  }
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+#app {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: $darkColor;
+}
+  
+#nav {
+    padding: 30px;
+  
+    a {
+      font-weight: bold;
+      color: $darkColor;
+  
+      &.router-link-exact-active {
+        color: $mainColor;
+      }
+    }
+}
+
+#bus-stop, #bus-line {
+  display: flex;
+  flex-wrap: wrap;
+  h1 {
+    @include mobile {
+     font-size: 1.5rem;
+    }
+  }
+
+  .left {
+    display: flex;
+    flex-direction: column;
+    width: 40vw;
+    height: calc(100vh - 100px);
+    @include mobile {
+      width: 100vw;
+    }
+    .search {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+      height: 35px;
+      min-height: 35px;
+      select {
+        width: 50%;
+        height: 100%;
+        padding: 0 1rem;
+      }
+      button {
+        height: 100%;
+        margin-left: 5px;
+        background-color: $mainColor;
+        color: $darkColor;
+        border: none;
+      }
+    }
+    .bus-list {
+      position: relative;
+      overflow-y: scroll;
+      flex-grow: 1;
+      margin: 1rem 2rem;
+      .bus-item {
+        background-color: rgb(253, 227, 110);
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+      }
+    }
+  }
+  .right {
+    height: calc(100vh - 100px);
+    width: 55vw;
+    @include mobile {
+      width: 100vw;
+    }
+    #map {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+  }
+    
+}
