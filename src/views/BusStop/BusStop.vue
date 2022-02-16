@@ -1,6 +1,6 @@
 <template>
   <div id="bus-stop">
-    <div class="left" :class="{scroll: this.busList.length}">
+    <div class="left" :class="{ scroll: this.busList.length }">
       <h1>公車站牌查詢頁</h1>
       <div class="search">
         <select v-model="city" name="city" id="city">
@@ -14,7 +14,7 @@
         </select>
         <button @click="searchBusStop">搜尋BUS站牌</button>
       </div>
-      <div class="bus-list" :class="{scroll: this.busList.length}">
+      <div class="bus-list" :class="{ scroll: this.busList.length }">
         <BusStopItem
           v-for="(bus, index) in busList"
           :key="index"
@@ -30,32 +30,32 @@
 </template>
 
 <script>
-import L from "leaflet";
-import axios from "axios";
-import BusStopItem from "./BusStopItem.vue";
-import cityOptions from "@/store/cityOptions.js";
-import jsSHA from "jssha" ;
+import L from 'leaflet';
+import axios from 'axios';
+import BusStopItem from './BusStopItem.vue';
+import cityOptions from '@/store/cityOptions.js';
+import jsSHA from 'jssha';
 // 設定空物件
 let openStreetMap = {};
 
 export default {
-  name: "BusStop",
+  name: 'BusStop',
   components: {
     BusStopItem,
   },
   data() {
     return {
-      city: "",
+      city: '',
       busList: [],
       cityOptions: cityOptions,
     };
   },
   mounted() {
-    openStreetMap = L.map("map", {
+    openStreetMap = L.map('map', {
       center: [24.755292, 121.7495626],
       zoom: 14, //縮放比例
     });
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
       maxZoom: 20,
@@ -86,11 +86,11 @@ export default {
     searchBusStop() {
       axios
         .get(
-          "https://ptx.transportdata.tw/MOTC/v2/Bus/Station/City/" + this.city,
+          'https://ptx.transportdata.tw/MOTC/v2/Bus/Station/City/' + this.city,
           {
             params: {
-              top: "30",
-              format: "JSON",
+              top: '30',
+              format: 'JSON',
             },
             headers: this.GetAuthorizationHeader(),
           }
@@ -98,7 +98,7 @@ export default {
         .then((res) => {
           this.busList = res.data;
           this.busList.forEach((obj) => (obj.isActive = false));
-          console.log("res.data:", this.busList);
+          console.log('res.data:', this.busList);
           // 更新地圖原點，以busList第一筆站牌之經緯度為中心
           openStreetMap.panTo(
             new L.LatLng(
@@ -136,15 +136,17 @@ export default {
     updateOrigin(index) {
       this.busList.forEach((obj) => (obj.isActive = false)); //reset isActive
       this.busList[index].isActive = true;
-      console.log('更新的busList:', this.busList)
+      console.log('更新的busList:', this.busList);
       openStreetMap.panTo(
         new L.LatLng(
           this.busList[index].StationPosition.PositionLat,
           this.busList[index].StationPosition.PositionLon
         )
       );
-      openStreetMap.openPopup(this.busList[index].StationPosition.PositionLat,
-          this.busList[index].StationPosition.PositionLon);
+      // openStreetMap.openPopup(
+      //   this.busList[index].StationPosition.PositionLat,
+      //   this.busList[index].StationPosition.PositionLon
+      // );
     },
   },
 };
