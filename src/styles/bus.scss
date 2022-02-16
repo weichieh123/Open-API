@@ -78,7 +78,7 @@ html, body {
       margin: 1rem 2rem;
       &.scroll {
         flex-grow: 1;
-        overflow-y: scroll;
+        overflow-y: auto;
       }
       .bus-item {
         background-color: rgb(253, 227, 110);
