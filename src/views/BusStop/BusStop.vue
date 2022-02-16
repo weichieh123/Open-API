@@ -15,6 +15,7 @@
         <button @click="searchBusStop">搜尋BUS站牌</button>
       </div>
       <div class="bus-list" :class="{ scroll: this.busList.length }">
+        <p v-if="isLoading">Data is loading...</p>
         <BusStopItem
           v-for="(bus, index) in busList"
           :key="index"
@@ -48,6 +49,7 @@ export default {
       city: '',
       busList: [],
       cityOptions: cityOptions,
+      isLoading: false,
     };
   },
   mounted() {
@@ -84,6 +86,7 @@ export default {
       }; //如果要將js運行在伺服器，可額外加入 'Accept-Encoding': 'gzip'，要求壓縮以減少網路傳輸資料量
     },
     searchBusStop() {
+      this.isLoading = true;
       axios
         .get(
           'https://ptx.transportdata.tw/MOTC/v2/Bus/Station/City/' + this.city,
@@ -132,6 +135,7 @@ export default {
           `
           );
       });
+      this.isLoading = false;
     },
     updateOrigin(index) {
       this.busList.forEach((obj) => (obj.isActive = false)); //reset isActive
