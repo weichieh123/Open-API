@@ -57,7 +57,7 @@ export default {
     });
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution:
-        'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
       maxZoom: 20,
     }).addTo(openStreetMap);
   },
@@ -143,6 +143,8 @@ export default {
           this.busList[index].StationPosition.PositionLon
         )
       );
+      openStreetMap.openPopup(this.busList[index].StationPosition.PositionLat,
+          this.busList[index].StationPosition.PositionLon);
     },
   },
 };
