@@ -87,6 +87,7 @@ export default {
     },
     searchBusStop() {
       this.isLoading = true;
+      this.busList = [];
       axios
         .get(
           'https://ptx.transportdata.tw/MOTC/v2/Bus/Station/City/' + this.city,
