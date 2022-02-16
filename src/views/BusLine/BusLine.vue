@@ -35,7 +35,15 @@ import L from 'leaflet';
 import axios from 'axios';
 import BusLineItem from './BusLineItem.vue';
 import cityOptions from '@/store/cityOptions.js';
-import jsSHA from "jssha" ;
+import jsSHA from 'jssha';
+// import redMarkerImg from '../../assets/red-marker.png';
+// const redMarker = new L.Icon({
+//   iconUrl: redMarkerImg,
+//   iconSize: [41, 41],
+//   iconAnchor: [12, 41],
+//   popupAnchor: [1, -34],
+// });
+
 // 設定空物件
 // TODO: reset舊的路線標記
 let openStreetMap = {};
@@ -59,6 +67,7 @@ export default {
       busRoutes: [], //此巴士(selectedBus)之所有站牌資料
       busRoutesGeometry: [], //此巴士(selectedBus)之路線經緯度資料
       cityOptions: cityOptions, //城市選項資料
+      // markers: [], //地圖上的marker資料 
     };
   },
   mounted() {
@@ -185,6 +194,7 @@ export default {
       let busRouteName = this.busRoutes.RouteName.Zh_tw;
       this.busRoutes.Stops.forEach((bus) => {
         //透過busRoutes.Stops經緯度疊加標記
+        // L.marker([bus.StopPosition.PositionLat, bus.StopPosition.PositionLon],{icon: redMarker})
         L.marker([bus.StopPosition.PositionLat, bus.StopPosition.PositionLon])
           .addTo(openStreetMap)
           .bindPopup(
