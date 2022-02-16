@@ -53,6 +53,7 @@ let myStyle = {
   weight: 5,
   opacity: 0.65,
 };
+let geoLayer, layerGroup;
 
 export default {
   name: 'BusStop',
@@ -67,7 +68,7 @@ export default {
       busRoutes: [], //此巴士(selectedBus)之所有站牌資料
       busRoutesGeometry: [], //此巴士(selectedBus)之路線經緯度資料
       cityOptions: cityOptions, //城市選項資料
-      // markers: [], //地圖上的marker資料 
+      // markers: [], //地圖上的marker資料
     };
   },
   mounted() {
@@ -80,8 +81,6 @@ export default {
         '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
       maxZoom: 20,
     }).addTo(openStreetMap);
-    // L.geoJSON(geojsonFeature).addTo(openStreetMap);
-    // console.log(process.env.VUE_APP_ID, process.env.VUE_APP_KEY);
   },
   methods: {
     GetAuthorizationHeader() {
@@ -179,10 +178,8 @@ export default {
         });
     },
     updateMap() {
-      // ADD
-      let geoLayer, layerGroup;
+      // clear routes
       if (this.selectedBus && geoLayer) {
-        console.log('清除上一筆路線');
         layerGroup.removeLayer(geoLayer);
       }
       // clear markers
@@ -210,16 +207,12 @@ export default {
         },
       ];
       // ADD
-      // let geoLayer = L.geoJSON().addTo(openStreetMap);
       geoLayer = L.geoJSON(myLines, {
         style: myStyle,
       }).addTo(openStreetMap);
       layerGroup = new L.LayerGroup();
       layerGroup.addTo(openStreetMap);
       layerGroup.addLayer(geoLayer);
-      // geoLayer.addData(myLines, {
-      //   style: myStyle,
-      // });
     },
     chooseBus(index) {
       // 按下Bus後，將所選的bus存至selectedBus，並將tag highlight
