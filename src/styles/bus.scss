@@ -20,11 +20,11 @@ html, body {
 }
   
 #nav {
-    padding: 30px;
-  
+    height: 70px;
     a {
       font-weight: bold;
       color: $darkColor;
+      line-height: 70px;
   
       &.router-link-exact-active {
         color: $mainColor;
@@ -36,6 +36,8 @@ html, body {
   display: flex;
   flex-wrap: wrap;
   h1 {
+    height: 30px;
+    line-height: 30px;
     @include mobile {
      font-size: 1.5rem;
     }
@@ -98,7 +100,7 @@ html, body {
     #map {
       position: relative;
       width: 100%;
-      height: 100%;
+      height: 97%;
     }
   }
     
