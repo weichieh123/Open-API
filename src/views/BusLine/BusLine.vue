@@ -32,10 +32,11 @@
 
 <script>
 import L from 'leaflet';
-import axios from 'axios';
+// import axios from 'axios';
 import BusLineItem from './BusLineItem.vue';
 import cityOptions from '@/store/cityOptions.js';
-import jsSHA from 'jssha';
+// import jsSHA from 'jssha';
+import { toSearchBus, stopRoute, routeGeo } from '../../store/bus';
 // import redMarkerImg from '../../assets/red-marker.png';
 // const redMarker = new L.Icon({
 //   iconUrl: redMarkerImg,
@@ -54,6 +55,10 @@ let myStyle = {
   opacity: 0.65,
 };
 let geoLayer, layerGroup;
+let params = {
+  top: '30',
+  format: 'JSON',
+};
 
 export default {
   name: 'BusStop',
@@ -83,41 +88,42 @@ export default {
     }).addTo(openStreetMap);
   },
   methods: {
-    GetAuthorizationHeader() {
-      let AppID = process.env.VUE_APP_ID;
-      let AppKey = process.env.VUE_APP_KEY;
+    // GetAuthorizationHeader() {
+    //   let AppID = process.env.VUE_APP_ID;
+    //   let AppKey = process.env.VUE_APP_KEY;
 
-      let GMTString = new Date().toGMTString();
-      let ShaObj = new jsSHA('SHA-1', 'TEXT');
-      ShaObj.setHMACKey(AppKey, 'TEXT');
-      ShaObj.update('x-date: ' + GMTString);
-      let HMAC = ShaObj.getHMAC('B64');
-      let Authorization =
-        'hmac username="' +
-        AppID +
-        '", algorithm="hmac-sha1", headers="x-date", signature="' +
-        HMAC +
-        '"';
+    //   let GMTString = new Date().toGMTString();
+    //   let ShaObj = new jsSHA('SHA-1', 'TEXT');
+    //   ShaObj.setHMACKey(AppKey, 'TEXT');
+    //   ShaObj.update('x-date: ' + GMTString);
+    //   let HMAC = ShaObj.getHMAC('B64');
+    //   let Authorization =
+    //     'hmac username="' +
+    //     AppID +
+    //     '", algorithm="hmac-sha1", headers="x-date", signature="' +
+    //     HMAC +
+    //     '"';
 
-      return {
-        Authorization: Authorization,
-        'X-Date': GMTString /*,'Accept-Encoding': 'gzip'*/,
-      }; //如果要將js運行在伺服器，可額外加入 'Accept-Encoding': 'gzip'，要求壓縮以減少網路傳輸資料量
-    },
+    //   return {
+    //     Authorization: Authorization,
+    //     'X-Date': GMTString /*,'Accept-Encoding': 'gzip'*/,
+    //   }; //如果要將js運行在伺服器，可額外加入 'Accept-Encoding': 'gzip'，要求壓縮以減少網路傳輸資料量
+    // },
     searchBus() {
       // 搜尋此城市(selectedCity)之所有BUS，存至busList，並增加一個欄位isActive作為tag class highlight依據
-      axios
-        .get(
-          'https://ptx.transportdata.tw/MOTC/v2/Bus/Route/City/' +
-            this.selectedCity,
-          {
-            params: {
-              top: '30',
-              format: 'JSON',
-            },
-            headers: this.GetAuthorizationHeader(),
-          }
-        )
+      // axios
+      //   .get(
+      //     'https://ptx.transportdata.tw/MOTC/v2/Bus/Route/City/' +
+      //       this.selectedCity,
+      //     {
+      //       params: {
+      //         top: '30',
+      //         format: 'JSON',
+      //       },
+      //       headers: this.GetAuthorizationHeader(),
+      //     }
+      //   )
+      toSearchBus(this.selectedCity, params)
         .then((res) => {
           this.busList = res.data;
           this.busList.forEach((obj) => (obj.isActive = false));
@@ -130,49 +136,52 @@ export default {
     searchBusRoute() {
       // call 兩個API，獲得站牌&路線經緯度
       // call updateMap()，將資料更新並標示在地圖上
-      let stopRouteURL =
-        'https://ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/';
-      let routeGeoURL = 'https://ptx.transportdata.tw/MOTC/v2/Bus/Shape/City/';
+      // let stopRouteURL =
+      //   'https://ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/';
+      // let routeGeoURL = 'https://ptx.transportdata.tw/MOTC/v2/Bus/Shape/City/';
       let regex = /([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/g;
-      axios
-        .all([
-          axios.get(stopRouteURL + this.selectedCity + '/' + this.selectedBus, {
-            params: {
-              top: '30',
-              format: 'JSON',
-            },
-            headers: this.GetAuthorizationHeader(),
-          }),
-          axios.get(routeGeoURL + this.selectedCity + '/' + this.selectedBus, {
-            params: {
-              top: '30',
-              format: 'JSON',
-            },
-            headers: this.GetAuthorizationHeader(),
-          }),
-        ])
-        .then(
-          axios.spread((res1, res2) => {
-            this.busRoutes = res1.data[0];
-            console.log('selectedCity:', this.selectedCity);
-            console.log('selectedBus之所有站牌資料,來自res1:', this.busRoutes);
-            // 更新地圖原點，以busRoutes.Stops第一筆站牌之經緯度為中心
-            openStreetMap.panTo(
-              new L.LatLng(
-                this.busRoutes.Stops[0].StopPosition.PositionLat,
-                this.busRoutes.Stops[0].StopPosition.PositionLon
-              )
-            );
-            let data = res2.data[0];
-            let geoStr = data.Geometry;
-            // 將string改為array of arrays格式
-            this.busRoutesGeometry = geoStr
-              .match(regex)
-              .map((item) => item.split(' ').map((item) => Number(item)));
-            console.log('selectedBus之路線經緯度資料:', this.busRoutesGeometry);
-            this.updateMap();
-          })
-        )
+      // axios
+      //   .all([
+      //     axios.get(stopRouteURL + this.selectedCity + '/' + this.selectedBus, {
+      //       params: {
+      //         top: '30',
+      //         format: 'JSON',
+      //       },
+      //       headers: this.GetAuthorizationHeader(),
+      //     }),
+      //     axios.get(routeGeoURL + this.selectedCity + '/' + this.selectedBus, {
+      //       params: {
+      //         top: '30',
+      //         format: 'JSON',
+      //       },
+      //       headers: this.GetAuthorizationHeader(),
+      //     }),
+      //   ])
+      Promise.all([
+        stopRoute(this.selectedCity, this.selectedBus, params),
+        routeGeo(this.selectedCity, this.selectedBus, params),
+      ])
+        .then(([res1, res2]) => {
+          // axios.spread((res1, res2) => {
+          this.busRoutes = res1.data[0];
+          console.log('selectedCity:', this.selectedCity);
+          console.log('selectedBus之所有站牌資料,來自res1:', this.busRoutes);
+          // 更新地圖原點，以busRoutes.Stops第一筆站牌之經緯度為中心
+          openStreetMap.panTo(
+            new L.LatLng(
+              this.busRoutes.Stops[0].StopPosition.PositionLat,
+              this.busRoutes.Stops[0].StopPosition.PositionLon
+            )
+          );
+          let data = res2.data[0];
+          let geoStr = data.Geometry;
+          // 將string改為array of arrays格式
+          this.busRoutesGeometry = geoStr
+            .match(regex)
+            .map((item) => item.split(' ').map((item) => Number(item)));
+          console.log('selectedBus之路線經緯度資料:', this.busRoutesGeometry);
+          this.updateMap();
+        })
         .catch((error) => {
           console.log(error);
         });
